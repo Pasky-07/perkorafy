@@ -335,12 +335,20 @@ export default function UsuariosPage() {
     </p>
 
     <DialogFooter className="mt-4">
-      <Button variant="outline" onClick={() => setConfirmarCambio(null)}>
-        Cancelar
-      </Button>
-      <Button onClick={confirmarToggle} className="bg-blue-600 text-white hover:bg-blue-700">
-        Confirmar
-      </Button>
+     <Button
+  onClick={() => setConfirmarCambio(null)}
+  className="bg-gray-300 text-gray-800 text-sm px-4 py-1.5 rounded-md hover:bg-gray-400 transition"
+>
+  Cancelar
+</Button>
+
+<Button
+  onClick={confirmarToggle}
+  className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md hover:bg-blue-700 transition"
+>
+  Confirmar
+</Button>
+
     </DialogFooter>
   </DialogContent>
 </Dialog>

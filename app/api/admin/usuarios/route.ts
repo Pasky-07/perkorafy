@@ -24,6 +24,8 @@ export async function GET(req: NextRequest) {
         name: true,
         email: true,
         perks: true,
+        // ACTIVO debe estar aquí:
+        activo: true,
       },
     });
 

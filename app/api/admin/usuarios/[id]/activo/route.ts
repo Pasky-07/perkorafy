@@ -1,27 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = parseInt(params.id)
+// PUT: Actualizar campo "activo" del usuario
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const id = parseInt(params.id, 10);
 
   if (isNaN(id)) {
-    return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
-  }
-
-  const { activo } = await req.json()
-
-  if (typeof activo !== 'boolean') {
-    return NextResponse.json({ error: 'Valor de activo inválido' }, { status: 400 })
+    return NextResponse.json({ error: 'ID no válido' }, { status: 400 });
   }
 
   try {
-    const user = await prisma.user.update({
+    const body = await req.json();
+    const { activo } = body;
+
+    if (typeof activo !== 'boolean') {
+      return NextResponse.json({ error: 'El campo "activo" debe ser booleano' }, { status: 400 });
+    }
+
+    const usuarioActualizado = await prisma.user.update({
       where: { id },
       data: { activo },
-    })
+    });
 
-    return NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true, usuario: usuarioActualizado });
   } catch (error) {
-    return NextResponse.json({ error: 'No se pudo actualizar el estado' }, { status: 500 })
+    console.error('[API ADMIN USUARIOS ACTIVO]', error);
+    return NextResponse.json({ error: 'Error al actualizar el estado del usuario' }, { status: 500 });
   }
 }

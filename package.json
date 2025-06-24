@@ -2,21 +2,21 @@
   "name": "perkorafy",
   "version": "1.0.0",
   "private": true,
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-"postinstall": "prisma generate --no-engine --data-proxy=false",
-  "lint": "next lint"
-}
-,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "postinstall": "prisma generate --no-engine --data-proxy=false",
+    "lint": "next lint"
+  },
   "dependencies": {
-    "@prisma/client": "6.7.0",
+    "@prisma/client": "^6.7.0",
     "@radix-ui/react-dialog": "^1.1.13",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-popover": "^1.1.14",
     "@radix-ui/react-slot": "^1.2.2",
+    "@radix-ui/react-switch": "^1.2.5",
     "autoprefixer": "^10.4.13",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
@@ -28,6 +28,7 @@
     "next-seo": "^6.1.0",
     "nodemailer": "^7.0.3",
     "papaparse": "^5.5.3",
+    "pg": "^8.16.0",
     "postcss": "^8.4.21",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -47,12 +48,11 @@
     "prettier": "3.2.5",
     "prisma": "6.7.0",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.4",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
-"prisma": {
-  "seed": "tsx prisma/seed.ts",
-  "generate": "prisma generate"
-}
-
+  "prisma": {
+    "seed": "tsx prisma/seed.ts",
+    "generate": "prisma generate"
+  }
 }

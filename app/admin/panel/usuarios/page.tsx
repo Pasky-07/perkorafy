@@ -320,26 +320,32 @@ export default function UsuariosPage() {
           </div>
         </DialogContent>
       </Dialog>
+<Dialog open={!!confirmarCambio} onOpenChange={() => setConfirmarCambio(null)}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>
+        {confirmarCambio?.nuevoEstado
+          ? '¿Confirmar activación del usuario?'
+          : '¿Confirmar desactivación del usuario?'}
+      </DialogTitle>
+    </DialogHeader>
 
-      <Dialog open={!!confirmarCambio} onOpenChange={() => setConfirmarCambio(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>¿Confirmar cambio de estado?</DialogTitle>
-          </DialogHeader>
-          <p>
-            ¿Estás seguro de que deseas{' '}
-            {confirmarCambio?.nuevoEstado ? 'activar' : 'desactivar'} este usuario?
-          </p>
-          <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setConfirmarCambio(null)}>
-              Cancelar
-            </Button>
-            <Button onClick={confirmarToggle} className="bg-blue-600 text-white hover:bg-blue-700">
-              Confirmar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+    <p className="text-sm text-gray-600">
+      El usuario será {confirmarCambio?.nuevoEstado ? 'activado' : 'desactivado'} inmediatamente.
+    </p>
+
+    <DialogFooter className="mt-4">
+      <Button variant="outline" onClick={() => setConfirmarCambio(null)}>
+        Cancelar
+      </Button>
+      <Button onClick={confirmarToggle} className="bg-blue-600 text-white hover:bg-blue-700">
+        Confirmar
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+      
     </div>
   )
 }

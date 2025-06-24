@@ -1,25 +1,26 @@
 generator client {
   provider = "prisma-client-js"
   output   = "./node_modules/@prisma/client"
-  dataProxy = true
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 model User {
-  id            Int               @id @default(autoincrement())
-  email         String            @unique
-  password      String
-  name          String
-  createdAt     DateTime          @default(now())
-  perks         Int               @default(0)
-  canjes        Canje[]
-  resetToken    String?           @unique
-  resetTokenExp DateTime?
+  id             Int                @id @default(autoincrement())
+  email          String             @unique
+  password       String
+  name           String
+  createdAt      DateTime           @default(now())
+  perks          Int                @default(0)
+  resetToken     String?            @unique
+  resetTokenExp  DateTime?
+  canjes         Canje[]
   recuperaciones PasswordRecovery[]
+  activo         Boolean            @default(true) // ✅ AÑADIR ESTA LÍNEA
 }
 
 model Perk {
@@ -38,8 +39,8 @@ model Canje {
   fecha     DateTime @default(now())
   id        Int      @id @default(autoincrement())
   perkId    Int
-  perk      Perk     @relation(fields: [perkId], references: [id], onDelete: Cascade)
-  usuario   User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  perk      Perk     @relation(fields: [perkId], references: [id])
+  usuario   User     @relation(fields: [usuarioId], references: [id])
 }
 
 model Admin {
@@ -51,12 +52,11 @@ model Admin {
 }
 
 model PasswordRecovery {
-  id          Int      @id @default(autoincrement())
-  usuarioId   Int
-  token       String   @unique
-  expiracion  DateTime
-  usuario     User     @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int
+  token      String   @unique
+  expiracion DateTime
+  usuario    User     @relation(fields: [usuarioId], references: [id])
 
   @@index([usuarioId])
 }
-

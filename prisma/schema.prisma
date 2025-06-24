@@ -20,7 +20,7 @@ model User {
   resetTokenExp  DateTime?
   canjes         Canje[]
   recuperaciones PasswordRecovery[]
-  activo         Boolean            @default(true) // ✅ AÑADIR ESTA LÍNEA
+  activo         Boolean            @default(true)
 }
 
 model Perk {

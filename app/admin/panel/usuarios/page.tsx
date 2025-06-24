@@ -1,31 +1,44 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UserActions } from '@/components/admin/UserActions'
 import { EditarPerksModal } from '@/components/admin/EditarPerksModal'
+import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
 
+import { DialogFooter } from '@/components/ui/dialog'
+
+// Extendemos el tipo Usuario para incluir "activo"
 type Usuario = {
   id: number
   name: string
   email: string
   perks: number
+  activo: boolean
 }
 
 export default function UsuariosPage() {
   const [usuarios, setUsuarios] = useState<Usuario[]>([])
   const [usuarioActivo, setUsuarioActivo] = useState<Usuario | null>(null)
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [confirmarCambio, setConfirmarCambio] = useState<{
+    id: number
+    nuevoEstado: boolean
+  } | null>(null)
 
   const [crearAbierto, setCrearAbierto] = useState(false)
   const [nuevoNombre, setNuevoNombre] = useState('')
   const [nuevoEmail, setNuevoEmail] = useState('')
   const [nuevoPerks, setNuevoPerks] = useState(0)
-
   const [passwordVisible, setPasswordVisible] = useState('')
   const [passwordReal, setPasswordReal] = useState('')
 
@@ -51,6 +64,42 @@ export default function UsuariosPage() {
     fetch('/api/admin/usuarios')
       .then((res) => res.json())
       .then((data) => setUsuarios(data))
+  }
+
+  const toggleActivo = (id: number, estadoActual: boolean) => {
+    setConfirmarCambio({ id, nuevoEstado: !estadoActual })
+  }
+
+  const confirmarToggle = async () => {
+    if (!confirmarCambio) return
+
+    try {
+      const res = await fetch(
+        `/api/admin/usuarios/${confirmarCambio.id}/activo`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activo: confirmarCambio.nuevoEstado }),
+        }
+      )
+
+      if (res.ok) {
+        setUsuarios((prev) =>
+          prev.map((u) =>
+            u.id === confirmarCambio.id
+              ? { ...u, activo: confirmarCambio.nuevoEstado }
+              : u
+          )
+        )
+        toast.success('Estado actualizado')
+      } else {
+        toast.error('Error al actualizar el estado')
+      }
+    } catch {
+      toast.error('Error de red')
+    }
+
+    setConfirmarCambio(null)
   }
 
   const crearUsuario = async () => {
@@ -106,9 +155,10 @@ export default function UsuariosPage() {
 
   const handleResetPassword = async (usuario: Usuario) => {
     try {
-      const res = await fetch(`/api/admin/usuarios/${usuario.id}/reset-password`, {
-        method: 'POST',
-      })
+      const res = await fetch(
+        `/api/admin/usuarios/${usuario.id}/reset-password`,
+        { method: 'POST' }
+      )
 
       if (res.ok) {
         toast.success(`Email de recuperación enviado a ${usuario.email}`)
@@ -122,7 +172,10 @@ export default function UsuariosPage() {
   }
 
   const handleEliminar = async (usuario: Usuario) => {
-    if (!confirm(`¿Estás seguro de que quieres eliminar a ${usuario.name}? Esta acción no se puede deshacer.`)) return
+    if (!confirm(
+      `¿Estás seguro de que quieres eliminar a ${usuario.name}? Esta acción no se puede deshacer.`
+    ))
+      return
 
     try {
       const res = await fetch(`/api/admin/usuarios/${usuario.id}`, {
@@ -171,6 +224,7 @@ export default function UsuariosPage() {
             <th className="text-left px-4 py-2">Nombre</th>
             <th className="text-left px-4 py-2">Email</th>
             <th className="text-left px-4 py-2">Perks</th>
+            <th className="text-left px-4 py-2">Activo</th>
             <th className="text-right px-4 py-2">Acciones</th>
           </tr>
         </thead>
@@ -180,6 +234,12 @@ export default function UsuariosPage() {
               <td className="px-4 py-2">{usuario.name}</td>
               <td className="px-4 py-2">{usuario.email}</td>
               <td className="px-4 py-2">{usuario.perks}</td>
+              <td className="px-4 py-2">
+                <Switch
+                  checked={usuario.activo}
+                  onCheckedChange={() => toggleActivo(usuario.id, usuario.activo)}
+                />
+              </td>
               <td className="px-4 py-2 text-right">
                 <UserActions
                   onEdit={() => handleEditar(usuario)}
@@ -260,7 +320,26 @@ export default function UsuariosPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={!!confirmarCambio} onOpenChange={() => setConfirmarCambio(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Confirmar cambio de estado?</DialogTitle>
+          </DialogHeader>
+          <p>
+            ¿Estás seguro de que deseas{' '}
+            {confirmarCambio?.nuevoEstado ? 'activar' : 'desactivar'} este usuario?
+          </p>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setConfirmarCambio(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={confirmarToggle} className="bg-blue-600 text-white hover:bg-blue-700">
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
-

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// PUT: Actualizar campo "activo" del usuario
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+// PATCH: Actualizar campo "activo" del usuario
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const id = parseInt(params.id, 10);
 
   if (isNaN(id)) {

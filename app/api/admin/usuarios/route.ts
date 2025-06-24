@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
         name: true,
         email: true,
         perks: true,
-        // ACTIVO debe estar aquí:
         activo: true,
       },
     });
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
     jwt.verify(token, JWT_SECRET);
 
     const body = await req.json();
-    const { name, email, perks, password } = body;
+    const { name, email, perks, password, activo = true } = body;
 
     if (!name || !email || perks === undefined || !password) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
@@ -67,12 +66,14 @@ export async function POST(req: NextRequest) {
         email,
         perks: parseInt(perks, 10),
         password: hashedPassword,
+        activo,
       },
       select: {
         id: true,
         name: true,
         email: true,
         perks: true,
+        activo: true,
       },
     });
 
@@ -98,4 +99,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 });
   }
 }
-

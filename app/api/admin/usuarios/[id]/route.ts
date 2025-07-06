@@ -17,8 +17,25 @@ export async function DELETE(
   try {
     jwt.verify(token, JWT_SECRET)
 
+    const userId = parseInt(params.id, 10)
+    if (isNaN(userId)) {
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 })
+    }
+
+    // Verificar si el usuario tiene canjes
+    const tieneCanjes = await prisma.canje.findFirst({
+      where: { usuarioId: userId },
+      select: { id: true }
+    })
+
+    if (tieneCanjes) {
+      return NextResponse.json({
+        error: "Este usuario no puede eliminarse porque tiene canjes realizados. Puedes desactivarlo si ya no debe acceder a la plataforma."
+      }, { status: 400 })
+    }
+
     const deleted = await prisma.user.delete({
-      where: { id: parseInt(params.id) },
+      where: { id: userId }
     })
 
     return NextResponse.json({ success: true, deleted })

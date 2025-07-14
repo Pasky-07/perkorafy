@@ -1,17 +1,16 @@
-import { prisma } from '@/lib/prisma'
-import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
 
-export async function generarTokenRecuperacion(userId: number) {
-  const token = crypto.randomBytes(32).toString('hex')
-  const expiracion = new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 horas de validez
+const JWT_SECRET = process.env.JWT_SECRET ?? 'clave_super_secreta'
 
-  await prisma.passwordRecovery.create({
-    data: {
-      usuarioId: userId,
-      token,
-      expiracion
-    }
-  })
+export async function generarTokenRecuperacion(userId: number, email: string) {
+  const token = jwt.sign(
+    {
+      userId,
+      email,
+    },
+    JWT_SECRET,
+    { expiresIn: '1h' }
+  )
 
   return token
 }

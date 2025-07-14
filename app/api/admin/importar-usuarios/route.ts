@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
         }
       })
 
-      const token = await generarTokenRecuperacion(nuevoUsuario.id)
+      const token = await generarTokenRecuperacion(nuevoUsuario.id, nuevoUsuario.email)
 
       await sendWelcomeEmail({
         nombre: nuevoUsuario.name,

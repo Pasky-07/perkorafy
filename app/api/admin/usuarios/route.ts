@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Generar el token de recuperación
-    const tokenRecuperacion = await generarTokenRecuperacion(nuevoUsuario.id);
+    const tokenRecuperacion = await generarTokenRecuperacion(nuevoUsuario.id,nuevoUsuario.email);
+
 
     // Enviar correo de bienvenida con el enlace de activación
     try {

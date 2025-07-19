@@ -50,13 +50,3 @@ model Admin {
   name      String
   createdAt DateTime @default(now())
 }
-
-model PasswordRecovery {
-  id         Int      @id @default(autoincrement())
-  usuarioId  Int
-  token      String   @unique
-  expiracion DateTime
-  usuario    User     @relation(fields: [usuarioId], references: [id])
-
-  @@index([usuarioId])
-}

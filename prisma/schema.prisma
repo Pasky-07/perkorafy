@@ -18,9 +18,7 @@ model User {
   resetToken     String?            @unique
   resetTokenExp  DateTime?
   canjes         Canje[]
-  recuperaciones PasswordRecovery[]
   activo         Boolean            @default(true)
-// campo añadido el 24 de junio para control de acceso
 }
 
 model Perk {

@@ -131,3 +131,14 @@ Incluye:
 
 *Versión estable revisada y consolidada tras validación completa de builds en Vercel.*
 
+## [Unreleased] - 2025-07-19
+
+### Añadido
+- Soporte completo para importación de usuarios desde CSV sin contraseña inicial.
+- Generación de token JWT de recuperación tras importar usuarios, compatible con el flujo `/api/recuperar`.
+- Envío automático de correo de bienvenida con enlace de activación.
+
+### Corregido
+- Enlace del email de bienvenida corregido: ahora redirige correctamente a `/recuperar?token=...`.
+- Error de autenticación SMTP solucionado tras actualizar la contraseña del remitente en Vercel.
+

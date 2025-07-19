@@ -22,7 +22,7 @@ export async function sendWelcomeEmail({
     },
   });
 
-  const enlaceRecuperacion = `https://app.perkorafy.com/reset-password?token=${token}`
+  const enlaceRecuperacion = `https://app.perkorafy.com/recuperar?token=${token}`
 
   const htmlContent = `
     <table style="max-width: 600px; margin: 0 auto; font-family: sans-serif; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">

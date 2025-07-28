@@ -56,7 +56,7 @@ export default function ComunicadosPage() {
                 <img
                   src={c.imagen}
                   alt={`Imagen de ${c.titulo}`}
-                  className="w-full h-48 object-cover rounded-t-xl"
+                  className="w-full max-h-60 md:max-h-52 object-contain rounded-lg mb-4 shadow"
                 />
               )}
               <CardContent className="p-6 space-y-4">

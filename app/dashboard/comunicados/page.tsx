@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { format } from 'date-fns'
-import es from 'date-fns/locale/es'
+import { es } from 'date-fns/locale'
 
 type Comunicado = {
   id: number

@@ -46,7 +46,7 @@ const handleLogout = async () => {
             <a className="block bg-blue-100 text-blue-900 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition" href="/dashboard/perfil">
               👤 Perfil de usuario
             </a>
-            <a className="block bg-blue-100 text-blue-900 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition" href="#">
+            <a className="block bg-blue-100 text-blue-900 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition" href="/comunicados">
               📣 Comunicados
             </a>
             <a className="block bg-blue-100 text-blue-900 font-medium px-4 py-2 rounded-md hover:bg-blue-200 transition" href="/dashboard/catalogo">

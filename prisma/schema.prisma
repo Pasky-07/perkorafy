@@ -47,4 +47,25 @@ model Admin {
   password  String
   name      String
   createdAt DateTime @default(now())
+
+  comunicados Comunicado[]
 }
+
+model Comunicado {
+  id              Int      @id @default(autoincrement())
+  titulo          String
+  contenido       String
+  tipo            String   @default("informativo") // "urgente", "novedad", etc.
+  linkExterno     String?                         // URL opcional
+  imagen          String?                         // Ruta o URL a imagen
+  destacado       Boolean  @default(false)         // Fijar arriba
+  visible         Boolean  @default(true)          // Mostrar/ocultar
+  fecha           DateTime @default(now())         // Fecha de publicación
+  fechaCaducidad  DateTime?                        // Hasta cuándo es válido
+  creadoPorId     Int
+  creadoPor       Admin    @relation(fields: [creadoPorId], references: [id])
+
+  @@index([fecha])
+  @@index([fechaCaducidad])
+}
+

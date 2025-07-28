@@ -53,7 +53,8 @@ export default function ComunicadosPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-800">{c.titulo}</h2>
-              <Badge variant="outline">{c.tipo}</Badge>
+              <Badge variant={c.tipo as "informativo" | "urgente" | "novedad" | "default"}>{c.tipo}</Badge>
+
             </div>
             <p className="text-gray-600 mt-2 whitespace-pre-line">{c.contenido}</p>
             {c.linkExterno && (

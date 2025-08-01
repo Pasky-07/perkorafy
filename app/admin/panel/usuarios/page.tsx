@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -15,9 +16,6 @@ import { EditarPerksModal } from '@/components/admin/EditarPerksModal'
 import { Switch } from '@/components/ui/switch'
 import Link from 'next/link'
 
-import { DialogFooter } from '@/components/ui/dialog'
-
-// Extendemos el tipo Usuario para incluir "activo"
 type Usuario = {
   id: number
   name: string
@@ -55,9 +53,7 @@ export default function UsuariosPage() {
 
   const cerrarModal = () => {
     setModalAbierto(false)
-    setTimeout(() => {
-      setUsuarioActivo(null)
-    }, 150)
+    setTimeout(() => setUsuarioActivo(null), 150)
   }
 
   const actualizarLista = () => {
@@ -140,14 +136,27 @@ export default function UsuariosPage() {
   }
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const char = e.target.value.slice(-1)
-    if (!char) return
+    const newValue = e.target.value
+    const prevLength = passwordVisible.length
 
-    setPasswordReal((prev) => prev + char)
-    setPasswordVisible((prev) => prev + char)
+    if (newValue.length < prevLength) {
+      // Borrando caracteres
+      setPasswordReal(passwordReal.slice(0, newValue.length))
+      setPasswordVisible('*'.repeat(newValue.length))
+      return
+    }
+
+    // Añadiendo un nuevo carácter
+    const newChar = newValue[newValue.length - 1]
+    setPasswordReal((prev) => prev + newChar)
+    setPasswordVisible((prev) => prev + newChar)
 
     setTimeout(() => {
-      setPasswordVisible((prev) => '*'.repeat(prev.length))
+      setPasswordVisible((prev) => {
+        const chars = prev.split('')
+        chars[chars.length - 1] = '*'
+        return chars.join('')
+      })
     }, 2000)
   }
 
@@ -171,34 +180,33 @@ export default function UsuariosPage() {
     }
   }
 
-const handleEliminar = async (usuario: Usuario) => {
-  if (!confirm(
-    `¿Estás seguro de que quieres eliminar a ${usuario.name}? Esta acción no se puede deshacer.`
-  ))
-    return
+  const handleEliminar = async (usuario: Usuario) => {
+    if (!confirm(
+      `¿Estás seguro de que quieres eliminar a ${usuario.name}? Esta acción no se puede deshacer.`
+    )) return
 
-  try {
-    const res = await fetch(`/api/admin/usuarios/${usuario.id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    })
+    try {
+      const res = await fetch(`/api/admin/usuarios/${usuario.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
 
-    const data = await res.json()
+      const data = await res.json()
 
-    if (!res.ok) {
-      toast.error(
-        data.error ||
-        'No se pudo eliminar el usuario. Inténtalo de nuevo más tarde.'
-      )
-      return
+      if (!res.ok) {
+        toast.error(
+          data.error ||
+          'No se pudo eliminar el usuario. Inténtalo de nuevo más tarde.'
+        )
+        return
+      }
+
+      toast.success('Usuario eliminado correctamente')
+      setUsuarios((prev) => prev.filter((u) => u.id !== usuario.id))
+    } catch {
+      toast.error('Error de red al intentar eliminar el usuario')
     }
-
-    toast.success('Usuario eliminado correctamente')
-    setUsuarios((prev) => prev.filter((u) => u.id !== usuario.id))
-  } catch {
-    toast.error('Error de red al intentar eliminar el usuario')
   }
-}
 
   const cumpleLongitud = passwordReal.length >= 6
   const tieneMayuscula = /[A-Z]/.test(passwordReal)
@@ -326,40 +334,38 @@ const handleEliminar = async (usuario: Usuario) => {
           </div>
         </DialogContent>
       </Dialog>
-<Dialog open={!!confirmarCambio} onOpenChange={() => setConfirmarCambio(null)}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>
-        {confirmarCambio?.nuevoEstado
-          ? '¿Confirmar activación del usuario?'
-          : '¿Confirmar desactivación del usuario?'}
-      </DialogTitle>
-    </DialogHeader>
 
-    <p className="text-sm text-gray-600">
-      El usuario será {confirmarCambio?.nuevoEstado ? 'activado' : 'desactivado'} inmediatamente.
-    </p>
+      <Dialog open={!!confirmarCambio} onOpenChange={() => setConfirmarCambio(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmarCambio?.nuevoEstado
+                ? '¿Confirmar activación del usuario?'
+                : '¿Confirmar desactivación del usuario?'}
+            </DialogTitle>
+          </DialogHeader>
 
-    <DialogFooter className="mt-4">
-     <Button
-  onClick={() => setConfirmarCambio(null)}
-  className="bg-gray-300 text-gray-800 text-sm px-4 py-1.5 rounded-md hover:bg-gray-400 transition"
->
-  Cancelar
-</Button>
+          <p className="text-sm text-gray-600">
+            El usuario será {confirmarCambio?.nuevoEstado ? 'activado' : 'desactivado'} inmediatamente.
+          </p>
 
-<Button
-  onClick={confirmarToggle}
-  className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md hover:bg-blue-700 transition"
->
-  Confirmar
-</Button>
-
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
-      
+          <DialogFooter className="mt-4">
+            <Button
+              onClick={() => setConfirmarCambio(null)}
+              className="bg-gray-300 text-gray-800 text-sm px-4 py-1.5 rounded-md hover:bg-gray-400 transition"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmarToggle}
+              className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md hover:bg-blue-700 transition"
+            >
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+

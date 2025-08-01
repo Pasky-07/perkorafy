@@ -24,6 +24,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link href="/admin/panel/usuarios" className="hover:underline">Usuarios</Link>
             <Link href="/admin/panel/perks" className="hover:underline">Perks</Link>
             <Link href="/admin/panel/canjes" className="hover:underline">Canjes</Link>
+            <Link href="/admin/panel/comunicados" className="hover:underline">Comunicados</Link> {/* ← nuevo enlace */}
           </nav>
         </div>
 

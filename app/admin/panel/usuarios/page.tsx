@@ -103,14 +103,16 @@ export default function UsuariosPage() {
     }
 
     try {
+      const body = {
+        name: nuevoNombre,
+        email: nuevoEmail,
+        perks: nuevoPerks,
+      }
+
       const res = await fetch('/api/admin/usuarios', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: nuevoNombre,
-          email: nuevoEmail,
-          perks: nuevoPerks,
-        }),
+        body: JSON.stringify(body),
       })
 
       if (res.ok) {
@@ -283,7 +285,7 @@ export default function UsuariosPage() {
           </p>
 
           <DialogFooter className="mt-4">
-            <Button onClick={() => setConfirmarCambio(null)} variant="outline">
+            <Button variant="outline" onClick={() => setConfirmarCambio(null)}>
               Cancelar
             </Button>
             <Button onClick={confirmarToggle}>

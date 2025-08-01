@@ -70,11 +70,98 @@ export default function ComunicadosPage() {
             <DialogTitle>Crear nuevo comunicado</DialogTitle>
           </DialogHeader>
 
-          {/* Aquí irá el formulario en el siguiente paso */}
+          {<form
+  onSubmit={async (e) => {
+    e.preventDefault()
 
-          <p className="text-sm text-gray-600 mt-2">
-            Aquí irá el formulario para ingresar los datos del nuevo comunicado.
-          </p>
+    const form = e.currentTarget
+    const formData = new FormData(form)
+
+    const payload = {
+      titulo: formData.get('titulo'),
+      contenido: formData.get('contenido'),
+      tipo: formData.get('tipo'),
+      imagen: formData.get('imagen'),
+      linkExterno: formData.get('linkExterno'),
+      destacado: formData.get('destacado') === 'on',
+      visible: formData.get('visible') === 'on',
+      fechaCaducidad: formData.get('fechaCaducidad') || null,
+    }
+
+    const res = await fetch('/api/admin/comunicados', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (res.ok) {
+      toast.success('Comunicado creado correctamente')
+      setModalAbierto(false)
+    } else {
+      const data = await res.json()
+      toast.error(data.error || 'Error al crear comunicado')
+    }
+  }}
+  className="space-y-4"
+>
+  <input name="titulo" placeholder="Título" required className="w-full border rounded px-3 py-2" />
+
+  <textarea
+    name="contenido"
+    placeholder="Contenido del comunicado"
+    required
+    className="w-full border rounded px-3 py-2"
+  />
+
+  <select
+    name="tipo"
+    className="w-full border rounded px-3 py-2"
+    defaultValue="informativo"
+  >
+    <option value="informativo">Informativo</option>
+    <option value="urgente">Urgente</option>
+    <option value="novedad">Novedad</option>
+  </select>
+
+  <input name="imagen" placeholder="Ruta de imagen o URL" className="w-full border rounded px-3 py-2" />
+  <input name="linkExterno" placeholder="Enlace externo (opcional)" className="w-full border rounded px-3 py-2" />
+
+  <div className="flex items-center gap-2">
+    <label>
+      <input type="checkbox" name="destacado" className="mr-1" />
+      Destacado
+    </label>
+    <label>
+      <input type="checkbox" name="visible" defaultChecked className="mr-1" />
+      Visible
+    </label>
+  </div>
+
+  <input
+    type="date"
+    name="fechaCaducidad"
+    className="w-full border rounded px-3 py-2"
+    placeholder="Fecha de caducidad"
+  />
+
+  <div className="flex justify-end gap-2 pt-2">
+    <Button
+      type="button"
+      variant="outline"
+      onClick={() => setModalAbierto(false)}
+      className="px-5 py-1.5 text-sm rounded-md"
+    >
+      Cancelar
+    </Button>
+    <Button
+      type="submit"
+      className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md"
+    >
+      Crear
+    </Button>
+  </div>
+</form>
+}
         </DialogContent>
       </Dialog>
     </div>

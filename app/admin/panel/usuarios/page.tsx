@@ -37,8 +37,6 @@ export default function UsuariosPage() {
   const [nuevoNombre, setNuevoNombre] = useState('')
   const [nuevoEmail, setNuevoEmail] = useState('')
   const [nuevoPerks, setNuevoPerks] = useState(0)
-  const [passwordVisible, setPasswordVisible] = useState('')
-  const [passwordReal, setPasswordReal] = useState('')
 
   useEffect(() => {
     fetch('/api/admin/usuarios')
@@ -99,7 +97,7 @@ export default function UsuariosPage() {
   }
 
   const crearUsuario = async () => {
-    if (!nuevoNombre || !nuevoEmail || nuevoPerks < 0 || !passwordReal) {
+    if (!nuevoNombre || !nuevoEmail || nuevoPerks < 0) {
       toast.error('Todos los campos son obligatorios')
       return
     }
@@ -112,7 +110,6 @@ export default function UsuariosPage() {
           name: nuevoNombre,
           email: nuevoEmail,
           perks: nuevoPerks,
-          password: passwordReal,
         }),
       })
 
@@ -124,8 +121,6 @@ export default function UsuariosPage() {
         setNuevoNombre('')
         setNuevoEmail('')
         setNuevoPerks(0)
-        setPasswordReal('')
-        setPasswordVisible('')
       } else {
         const data = await res.json()
         toast.error(data.error || 'Error al crear usuario')
@@ -133,31 +128,6 @@ export default function UsuariosPage() {
     } catch {
       toast.error('Error de conexión con el servidor')
     }
-  }
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    const prevLength = passwordVisible.length
-
-    if (newValue.length < prevLength) {
-      // Borrando caracteres
-      setPasswordReal(passwordReal.slice(0, newValue.length))
-      setPasswordVisible('*'.repeat(newValue.length))
-      return
-    }
-
-    // Añadiendo un nuevo carácter
-    const newChar = newValue[newValue.length - 1]
-    setPasswordReal((prev) => prev + newChar)
-    setPasswordVisible((prev) => prev + newChar)
-
-    setTimeout(() => {
-      setPasswordVisible((prev) => {
-        const chars = prev.split('')
-        chars[chars.length - 1] = '*'
-        return chars.join('')
-      })
-    }, 2000)
   }
 
   const handleEditar = (usuario: Usuario) => abrirModal(usuario)
@@ -207,11 +177,6 @@ export default function UsuariosPage() {
       toast.error('Error de red al intentar eliminar el usuario')
     }
   }
-
-  const cumpleLongitud = passwordReal.length >= 6
-  const tieneMayuscula = /[A-Z]/.test(passwordReal)
-  const tieneNumero = /[0-9]/.test(passwordReal)
-  const passwordValida = cumpleLongitud && tieneMayuscula && tieneNumero
 
   return (
     <div className="p-4 space-y-4">
@@ -298,35 +263,13 @@ export default function UsuariosPage() {
               onChange={(e) => setNuevoPerks(Number(e.target.value))}
             />
 
-            <div>
-              <Input
-                placeholder="Contraseña"
-                type="text"
-                value={passwordVisible}
-                onChange={handlePasswordChange}
-              />
-
-              <div className="text-sm mt-2 space-y-1 text-left">
-                <p className={cumpleLongitud ? 'text-green-600' : 'text-red-500'}>
-                  • Mínimo 6 caracteres
-                </p>
-                <p className={tieneMayuscula ? 'text-green-600' : 'text-red-500'}>
-                  • Al menos una mayúscula
-                </p>
-                <p className={tieneNumero ? 'text-green-600' : 'text-red-500'}>
-                  • Al menos un número
-                </p>
-              </div>
-            </div>
-
             <div className="flex justify-end gap-2 pt-2">
               <Button variant="outline" onClick={() => setCrearAbierto(false)}>
                 Cancelar
               </Button>
               <Button
                 onClick={crearUsuario}
-                disabled={!passwordValida}
-                className="bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                className="bg-blue-600 text-white hover:bg-blue-700"
               >
                 Crear
               </Button>
@@ -368,4 +311,3 @@ export default function UsuariosPage() {
     </div>
   )
 }
-

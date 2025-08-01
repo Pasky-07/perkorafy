@@ -11,7 +11,7 @@ datasource db {
 model User {
   id             Int                @id @default(autoincrement())
   email          String             @unique
-  password       String
+  password       String?            // ← antes era obligatorio; ahora opcional
   name           String
   createdAt      DateTime           @default(now())
   perks          Int                @default(0)

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
 import { sendWelcomeEmail } from '@/lib/email/sendWelcomeEmail';
 import { generarTokenRecuperacion } from '@/lib/tokens';
 
@@ -47,9 +46,9 @@ export async function POST(req: NextRequest) {
     jwt.verify(token, JWT_SECRET);
 
     const body = await req.json();
-    const { name, email, perks, password, activo = true } = body;
+    const { name, email, perks, activo = true } = body;
 
-    if (!name || !email || perks === undefined || !password) {
+    if (!name || !email || perks === undefined) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
     }
 
@@ -58,15 +57,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email no válido' }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     const nuevoUsuario = await prisma.user.create({
       data: {
         name,
         email,
         perks: parseInt(perks, 10),
-        password: hashedPassword,
         activo,
+        // No se guarda password aún; el usuario la establecerá con el enlace del correo
       },
       select: {
         id: true,
@@ -77,11 +74,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Generar el token de recuperación
-    const tokenRecuperacion = await generarTokenRecuperacion(nuevoUsuario.id,nuevoUsuario.email);
+    const tokenRecuperacion = await generarTokenRecuperacion(nuevoUsuario.id, nuevoUsuario.email);
 
-
-    // Enviar correo de bienvenida con el enlace de activación
     try {
       console.log('[API] Llamando a sendWelcomeEmail...');
       await sendWelcomeEmail({
@@ -100,3 +94,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 });
   }
 }
+

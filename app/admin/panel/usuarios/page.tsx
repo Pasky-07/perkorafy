@@ -185,10 +185,16 @@ export default function UsuariosPage() {
       <h1 className="text-2xl font-semibold">Gestión de Usuarios</h1>
 
       <div className="flex gap-4">
-        <Button onClick={() => setCrearAbierto(true)}>Crear usuario</Button>
+        <Button
+    onClick={() => setCrearAbierto(true)}
+    className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-2 text-sm rounded-md"
+  >Crear usuario</Button>
 
         <Link href="/admin/panel/importar">
-          <Button variant="outline">Importar CSV</Button>
+          <Button
+      variant="outline"
+      className="px-5 py-2 text-sm rounded-md"
+    >Importar CSV</Button>
         </Link>
       </div>
 
@@ -259,10 +265,17 @@ export default function UsuariosPage() {
             />
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setCrearAbierto(false)}>
+              <Button
+    variant="outline"
+    onClick={() => setCrearAbierto(false)}
+    className="px-5 py-1.5 text-sm rounded-md"
+  >
                 Cancelar
               </Button>
-              <Button onClick={crearUsuario}>
+                <Button
+    onClick={crearUsuario}
+    className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md"
+  >
                 Crear
               </Button>
             </div>

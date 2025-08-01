@@ -183,17 +183,10 @@ export default function UsuariosPage() {
       <h1 className="text-2xl font-semibold">Gestión de Usuarios</h1>
 
       <div className="flex gap-4">
-        <Button
-          onClick={() => setCrearAbierto(true)}
-          className="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          Crear usuario
-        </Button>
+        <Button onClick={() => setCrearAbierto(true)}>Crear usuario</Button>
 
         <Link href="/admin/panel/importar">
-          <Button variant="outline" className="px-3 py-1 text-sm rounded-md">
-            Importar CSV
-          </Button>
+          <Button variant="outline">Importar CSV</Button>
         </Link>
       </div>
 
@@ -267,10 +260,7 @@ export default function UsuariosPage() {
               <Button variant="outline" onClick={() => setCrearAbierto(false)}>
                 Cancelar
               </Button>
-              <Button
-                onClick={crearUsuario}
-                className="bg-blue-600 text-white hover:bg-blue-700"
-              >
+              <Button onClick={crearUsuario}>
                 Crear
               </Button>
             </div>
@@ -293,16 +283,10 @@ export default function UsuariosPage() {
           </p>
 
           <DialogFooter className="mt-4">
-            <Button
-              onClick={() => setConfirmarCambio(null)}
-              className="bg-gray-300 text-gray-800 text-sm px-4 py-1.5 rounded-md hover:bg-gray-400 transition"
-            >
+            <Button onClick={() => setConfirmarCambio(null)} variant="outline">
               Cancelar
             </Button>
-            <Button
-              onClick={confirmarToggle}
-              className="bg-blue-600 text-white text-sm px-4 py-1.5 rounded-md hover:bg-blue-700 transition"
-            >
+            <Button onClick={confirmarToggle}>
               Confirmar
             </Button>
           </DialogFooter>

@@ -4,6 +4,36 @@ import jwt from 'jsonwebtoken'
 
 const JWT_SECRET = process.env.JWT_SECRET ?? 'clave_super_secreta'
 
+// GET: Listar comunicados
+export async function GET(req: NextRequest) {
+  const token = req.cookies.get('adminToken')?.value
+
+  if (!token) {
+    return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+  }
+
+  try {
+    jwt.verify(token, JWT_SECRET)
+
+    const comunicados = await prisma.comunicado.findMany({
+      orderBy: { fecha: 'desc' },
+      select: {
+        id: true,
+        titulo: true,
+        tipo: true,
+        visible: true,
+        destacado: true,
+        fecha: true,
+      },
+    })
+
+    return NextResponse.json(comunicados)
+  } catch (err) {
+    console.error('[API ADMIN COMUNICADOS GET]', err)
+    return NextResponse.json({ error: 'Error al cargar comunicados' }, { status: 500 })
+  }
+}
+
 // POST: Crear nuevo comunicado
 export async function POST(req: NextRequest) {
   const token = req.cookies.get('adminToken')?.value
@@ -27,29 +57,19 @@ export async function POST(req: NextRequest) {
       fechaCaducidad,
     } = body
 
-    // Validaciones obligatorias
     if (!titulo || !contenido) {
-      return NextResponse.json(
-        { error: 'Título y contenido son obligatorios' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Título y contenido son obligatorios' }, { status: 400 })
     }
 
-    // Validar tipo como uno de los permitidos
     const tiposPermitidos = ['informativo', 'urgente', 'novedad']
     if (!tiposPermitidos.includes(tipo)) {
-      return NextResponse.json(
-        { error: `Tipo no válido. Tipos permitidos: ${tiposPermitidos.join(', ')}` },
-        { status: 400 }
-      )
+      return NextResponse.json({
+        error: `Tipo no válido. Tipos permitidos: ${tiposPermitidos.join(', ')}`,
+      }, { status: 400 })
     }
 
-    // Debe haber al menos imagen o link externo
     if (!imagen && !linkExterno) {
-      return NextResponse.json(
-        { error: 'Debe incluirse una imagen o un enlace externo' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Debe incluirse una imagen o un enlace externo' }, { status: 400 })
     }
 
     const nuevo = await prisma.comunicado.create({
@@ -72,3 +92,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 })
   }
 }
+

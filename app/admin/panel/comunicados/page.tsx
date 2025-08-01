@@ -19,7 +19,7 @@ export default function ComunicadosPage() {
   const [modalAbierto, setModalAbierto] = useState(false)
 
   useEffect(() => {
-    fetch('/api/admin/comunicados/listado') // ← provisional si haces GET más adelante
+    fetch('/api/admin/comunicados') // ← provisional si haces GET más adelante
       .then(res => res.json())
       .then(data => setComunicados(data))
       .catch(() => toast.error('Error al cargar los comunicados'))

@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         linkExterno: body.linkExterno ?? '',
         destacado: body.destacado ?? false,
         visible: body.visible ?? false,
-        fechaCaducidad: body.fechaCaducidad ?? null,
+        fechaCaducidad: body.fechaCaducidad ? new Date(body.fechaCaducidad) : null,
       },
     })
 

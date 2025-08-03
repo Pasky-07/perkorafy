@@ -24,6 +24,9 @@ export async function GET(req: NextRequest) {
         visible: true,
         destacado: true,
         fechaCaducidad: true,
+	contenido: true,
+        imagen: true,
+        linkExterno: true,
       },
     })
 

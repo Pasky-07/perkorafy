@@ -17,6 +17,8 @@ type Comunicado = {
 export default function ComunicadosPage() {
   const [comunicados, setComunicados] = useState<Comunicado[]>([])
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [comunicadoAEliminar, setComunicadoAEliminar] = useState<Comunicado | null>(null)
+  const [confirmarEliminacion, setConfirmarEliminacion] = useState(false)
 
   useEffect(() => {
     fetch('/api/admin/comunicados')
@@ -25,18 +27,18 @@ export default function ComunicadosPage() {
       .catch(() => toast.error('Error al cargar los comunicados'))
   }, [])
 
-  const handleEliminar = async (id: number) => {
-    const confirmar = confirm('¿Estás seguro de que quieres eliminar este comunicado?')
+  const handleEliminar = async () => {
+    if (!comunicadoAEliminar) return
 
-    if (!confirmar) return
-
-    const res = await fetch(`/api/admin/comunicados/${id}`, {
+    const res = await fetch(`/api/admin/comunicados/${comunicadoAEliminar.id}`, {
       method: 'DELETE',
     })
 
     if (res.ok) {
-      toast.success('Comunicado eliminado')
-      setComunicados(prev => prev.filter(c => c.id !== id))
+      toast.success('Comunicado eliminado correctamente')
+      setComunicados(prev => prev.filter(c => c.id !== comunicadoAEliminar.id))
+      setConfirmarEliminacion(false)
+      setComunicadoAEliminar(null)
     } else {
       toast.error('Error al eliminar el comunicado')
     }
@@ -74,28 +76,31 @@ export default function ComunicadosPage() {
               <td className="px-4 py-2">{c.visible ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">{c.destacado ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">
-  <div className="flex gap-2">
-    <Button
-      className="px-3 py-1 text-sm"
-      onClick={() => toast.info('Funcionalidad de edición próximamente')}
-    >
-      Editar
-    </Button>
-    <Button
-      variant="destructive"
-      className="px-3 py-1 text-sm"
-      onClick={() => handleEliminar(c.id)}
-    >
-      Eliminar
-    </Button>
-  </div>
-</td>
-
+                <div className="flex gap-2">
+                  <Button
+                    className="px-3 py-1 text-sm"
+                    onClick={() => toast.info('Funcionalidad de edición próximamente')}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="px-3 py-1 text-sm"
+                    onClick={() => {
+                      setComunicadoAEliminar(c)
+                      setConfirmarEliminacion(true)
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
 
+      {/* Modal crear comunicado */}
       <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
         <DialogContent>
           <DialogHeader>
@@ -137,24 +142,12 @@ export default function ComunicadosPage() {
             className="space-y-4"
           >
             <input name="titulo" placeholder="Título" required className="w-full border rounded px-3 py-2" />
-
-            <textarea
-              name="contenido"
-              placeholder="Contenido del comunicado"
-              required
-              className="w-full border rounded px-3 py-2"
-            />
-
-            <select
-              name="tipo"
-              className="w-full border rounded px-3 py-2"
-              defaultValue="informativo"
-            >
+            <textarea name="contenido" placeholder="Contenido del comunicado" required className="w-full border rounded px-3 py-2" />
+            <select name="tipo" className="w-full border rounded px-3 py-2" defaultValue="informativo">
               <option value="informativo">Informativo</option>
               <option value="urgente">Urgente</option>
               <option value="novedad">Novedad</option>
             </select>
-
             <input name="imagen" placeholder="Ruta de imagen o URL" className="w-full border rounded px-3 py-2" />
             <input name="linkExterno" placeholder="Enlace externo (opcional)" className="w-full border rounded px-3 py-2" />
 
@@ -169,32 +162,48 @@ export default function ComunicadosPage() {
               </label>
             </div>
 
-            <input
-              type="date"
-              name="fechaCaducidad"
-              className="w-full border rounded px-3 py-2"
-              placeholder="Fecha de caducidad"
-            />
+            <input type="date" name="fechaCaducidad" className="w-full border rounded px-3 py-2" placeholder="Fecha de caducidad" />
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setModalAbierto(false)}
-                className="px-5 py-1.5 text-sm rounded-md"
-              >
+              <Button type="button" variant="outline" onClick={() => setModalAbierto(false)} className="px-5 py-1.5 text-sm rounded-md">
                 Cancelar
               </Button>
-              <Button
-                type="submit"
-                className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md"
-              >
+              <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md">
                 Crear
               </Button>
             </div>
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Modal Confirmación Eliminación */}
+      <Dialog open={confirmarEliminacion} onOpenChange={setConfirmarEliminacion}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Eliminar comunicado</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm">
+            ¿Estás seguro de que deseas eliminar el comunicado <strong>{comunicadoAEliminar?.titulo}</strong>?
+          </p>
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setConfirmarEliminacion(false)}
+              className="px-5 py-1.5 text-sm"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleEliminar}
+              className="px-5 py-1.5 text-sm"
+            >
+              Eliminar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+

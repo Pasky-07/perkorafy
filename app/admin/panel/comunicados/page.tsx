@@ -11,7 +11,7 @@ type Comunicado = {
   tipo: string
   visible: boolean
   destacado: boolean
-  fecha: string
+  fechaCaducidad: string
 }
 
 export default function ComunicadosPage() {

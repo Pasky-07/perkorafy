@@ -74,21 +74,23 @@ export default function ComunicadosPage() {
               <td className="px-4 py-2">{c.visible ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">{c.destacado ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">
-                <Button
-                  variant="outline"
-                  className="text-sm mr-2"
-                  onClick={() => toast.info('Funcionalidad de edición próximamente')}
-                >
-                  Editar
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="text-sm"
-                  onClick={() => handleEliminar(c.id)}
-                >
-                  Eliminar
-                </Button>
-              </td>
+  <div className="flex gap-2">
+    <Button
+      className="px-3 py-1 text-sm"
+      onClick={() => toast.info('Funcionalidad de edición próximamente')}
+    >
+      Editar
+    </Button>
+    <Button
+      variant="destructive"
+      className="px-3 py-1 text-sm"
+      onClick={() => handleEliminar(c.id)}
+    >
+      Eliminar
+    </Button>
+  </div>
+</td>
+
             </tr>
           ))}
         </tbody>

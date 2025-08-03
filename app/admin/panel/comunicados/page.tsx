@@ -12,11 +12,16 @@ type Comunicado = {
   visible: boolean
   destacado: boolean
   fechaCaducidad: string
+  contenido?: string
+  imagen?: string
+  linkExterno?: string
 }
 
 export default function ComunicadosPage() {
   const [comunicados, setComunicados] = useState<Comunicado[]>([])
   const [modalAbierto, setModalAbierto] = useState(false)
+  const [modoEdicion, setModoEdicion] = useState(false)
+  const [comunicadoEditando, setComunicadoEditando] = useState<Comunicado | null>(null)
   const [comunicadoAEliminar, setComunicadoAEliminar] = useState<Comunicado | null>(null)
   const [confirmarEliminacion, setConfirmarEliminacion] = useState(false)
 
@@ -49,7 +54,11 @@ export default function ComunicadosPage() {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">Comunicados</h1>
         <Button
-          onClick={() => setModalAbierto(true)}
+          onClick={() => {
+            setModalAbierto(true)
+            setModoEdicion(false)
+            setComunicadoEditando(null)
+          }}
           className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-2 text-sm rounded-md"
         >
           Crear comunicado
@@ -79,7 +88,11 @@ export default function ComunicadosPage() {
                 <div className="flex gap-2">
                   <Button
                     className="px-3 py-1 text-sm"
-                    onClick={() => toast.info('Funcionalidad de edición próximamente')}
+                    onClick={() => {
+                      setModoEdicion(true)
+                      setComunicadoEditando(c)
+                      setModalAbierto(true)
+                    }}
                   >
                     Editar
                   </Button>
@@ -100,11 +113,11 @@ export default function ComunicadosPage() {
         </tbody>
       </table>
 
-      {/* Modal crear comunicado */}
+      {/* Modal crear/editar comunicado */}
       <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Crear nuevo comunicado</DialogTitle>
+            <DialogTitle>{modoEdicion ? 'Editar comunicado' : 'Crear nuevo comunicado'}</DialogTitle>
           </DialogHeader>
 
           <form
@@ -125,51 +138,130 @@ export default function ComunicadosPage() {
                 fechaCaducidad: formData.get('fechaCaducidad') || null,
               }
 
-              const res = await fetch('/api/admin/comunicados', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-              })
+              const res = await fetch(
+                modoEdicion
+                  ? `/api/admin/comunicados/${comunicadoEditando?.id}`
+                  : '/api/admin/comunicados',
+                {
+                  method: modoEdicion ? 'PUT' : 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
+                }
+              )
 
               if (res.ok) {
-                toast.success('Comunicado creado correctamente')
+                const nuevo = await res.json()
+
+                if (modoEdicion) {
+                  setComunicados((prev) =>
+                    prev.map((c) => (c.id === nuevo.id ? nuevo : c))
+                  )
+                  toast.success('Comunicado actualizado correctamente')
+                } else {
+                  setComunicados((prev) => [...prev, nuevo])
+                  toast.success('Comunicado creado correctamente')
+                }
+
                 setModalAbierto(false)
+                setModoEdicion(false)
+                setComunicadoEditando(null)
               } else {
                 const data = await res.json()
-                toast.error(data.error || 'Error al crear comunicado')
+                toast.error(data.error || 'Error al guardar comunicado')
               }
             }}
             className="space-y-4"
           >
-            <input name="titulo" placeholder="Título" required className="w-full border rounded px-3 py-2" />
-            <textarea name="contenido" placeholder="Contenido del comunicado" required className="w-full border rounded px-3 py-2" />
-            <select name="tipo" className="w-full border rounded px-3 py-2" defaultValue="informativo">
+            <input
+              name="titulo"
+              placeholder="Título"
+              required
+              defaultValue={modoEdicion ? comunicadoEditando?.titulo : ''}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <textarea
+              name="contenido"
+              placeholder="Contenido del comunicado"
+              required
+              defaultValue={modoEdicion ? comunicadoEditando?.contenido : ''}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <select
+              name="tipo"
+              className="w-full border rounded px-3 py-2"
+              defaultValue={modoEdicion ? comunicadoEditando?.tipo : 'informativo'}
+            >
               <option value="informativo">Informativo</option>
               <option value="urgente">Urgente</option>
               <option value="novedad">Novedad</option>
             </select>
-            <input name="imagen" placeholder="Ruta de imagen o URL" className="w-full border rounded px-3 py-2" />
-            <input name="linkExterno" placeholder="Enlace externo (opcional)" className="w-full border rounded px-3 py-2" />
+
+            <input
+              name="imagen"
+              placeholder="Ruta de imagen o URL"
+              defaultValue={modoEdicion ? comunicadoEditando?.imagen : ''}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            <input
+              name="linkExterno"
+              placeholder="Enlace externo (opcional)"
+              defaultValue={modoEdicion ? comunicadoEditando?.linkExterno : ''}
+              className="w-full border rounded px-3 py-2"
+            />
 
             <div className="flex items-center gap-2">
               <label>
-                <input type="checkbox" name="destacado" className="mr-1" />
+                <input
+                  type="checkbox"
+                  name="destacado"
+                  defaultChecked={modoEdicion ? comunicadoEditando?.destacado : false}
+                  className="mr-1"
+                />
                 Destacado
               </label>
               <label>
-                <input type="checkbox" name="visible" defaultChecked className="mr-1" />
+                <input
+                  type="checkbox"
+                  name="visible"
+                  defaultChecked={modoEdicion ? comunicadoEditando?.visible : true}
+                  className="mr-1"
+                />
                 Visible
               </label>
             </div>
 
-            <input type="date" name="fechaCaducidad" className="w-full border rounded px-3 py-2" placeholder="Fecha de caducidad" />
+            <input
+              type="date"
+              name="fechaCaducidad"
+              defaultValue={
+                modoEdicion && comunicadoEditando?.fechaCaducidad
+                  ? comunicadoEditando.fechaCaducidad.slice(0, 10)
+                  : ''
+              }
+              className="w-full border rounded px-3 py-2"
+            />
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button type="button" variant="outline" onClick={() => setModalAbierto(false)} className="px-5 py-1.5 text-sm rounded-md">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setModalAbierto(false)
+                  setModoEdicion(false)
+                  setComunicadoEditando(null)
+                }}
+                className="px-5 py-1.5 text-sm rounded-md"
+              >
                 Cancelar
               </Button>
-              <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md">
-                Crear
+              <Button
+                type="submit"
+                className="bg-blue-600 text-white hover:bg-blue-700 px-5 py-1.5 text-sm rounded-md"
+              >
+                {modoEdicion ? 'Guardar cambios' : 'Crear'}
               </Button>
             </div>
           </form>
@@ -183,7 +275,8 @@ export default function ComunicadosPage() {
             <DialogTitle>Eliminar comunicado</DialogTitle>
           </DialogHeader>
           <p className="text-sm">
-            ¿Estás seguro de que deseas eliminar el comunicado <strong>{comunicadoAEliminar?.titulo}</strong>?
+            ¿Estás seguro de que deseas eliminar el comunicado{' '}
+            <strong>{comunicadoAEliminar?.titulo}</strong>?
           </p>
           <div className="flex justify-end gap-2 pt-4">
             <Button

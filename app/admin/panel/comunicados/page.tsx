@@ -42,7 +42,7 @@ export default function ComunicadosPage() {
           <tr>
             <th className="text-left px-4 py-2">Título</th>
             <th className="text-left px-4 py-2">Tipo</th>
-            <th className="text-left px-4 py-2">Fecha</th>
+            <th className="text-left px-4 py-2">Caducidad</th>
             <th className="text-left px-4 py-2">Visible</th>
             <th className="text-left px-4 py-2">Destacado</th>
             <th className="text-left px-4 py-2">Acciones</th>
@@ -53,7 +53,7 @@ export default function ComunicadosPage() {
             <tr key={c.id} className="border-t">
               <td className="px-4 py-2">{c.titulo}</td>
               <td className="px-4 py-2 capitalize">{c.tipo}</td>
-              <td className="px-4 py-2">{new Date(c.fecha).toLocaleDateString()}</td>
+              <td className="px-4 py-2">{new Date(c.fechaCaducidad).toLocaleDateString()}</td>
               <td className="px-4 py-2">{c.visible ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">{c.destacado ? 'Sí' : 'No'}</td>
               <td className="px-4 py-2">

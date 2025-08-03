@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         tipo: true,
         visible: true,
         destacado: true,
-        fecha: true,
+        fechaCaducidad: true,
       },
     })
 

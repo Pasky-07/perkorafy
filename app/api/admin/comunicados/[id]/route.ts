@@ -20,6 +20,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const id = parseInt(params.id)
+
   if (isNaN(id)) {
     return NextResponse.json({ error: 'ID inválido' }, { status: 400 })
   }
@@ -31,18 +32,19 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       where: { id },
       data: {
         titulo: body.titulo,
-        contenido: body.contenido,
+        contenido: body.contenido ?? '',
         tipo: body.tipo,
-        imagen: body.imagen,
-        linkExterno: body.linkExterno,
-        destacado: body.destacado,
-        visible: body.visible,
-        fechaCaducidad: body.fechaCaducidad,
+        imagen: body.imagen ?? '',
+        linkExterno: body.linkExterno ?? '',
+        destacado: body.destacado ?? false,
+        visible: body.visible ?? false,
+        fechaCaducidad: body.fechaCaducidad ?? null,
       },
     })
 
     return NextResponse.json(comunicadoActualizado)
   } catch (error) {
+    console.error('Error actualizando comunicado:', error)
     return NextResponse.json({ error: 'No se pudo actualizar el comunicado' }, { status: 500 })
   }
 }

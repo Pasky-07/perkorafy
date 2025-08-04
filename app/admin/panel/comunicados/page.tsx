@@ -113,7 +113,6 @@ export default function ComunicadosPage() {
         </tbody>
       </table>
 
-      {/* Modal crear/editar comunicado */}
       <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
         <DialogContent>
           <DialogHeader>
@@ -198,12 +197,59 @@ export default function ComunicadosPage() {
               <option value="novedad">Novedad</option>
             </select>
 
-            <input
-              name="imagen"
-              placeholder="Ruta de imagen o URL"
-              defaultValue={modoEdicion ? comunicadoEditando?.imagen : ''}
-              className="w-full border rounded px-3 py-2"
-            />
+            {/* Subida de imagen y preview */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Imagen del comunicado</label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (!file) return
+
+                  const formData = new FormData()
+                  formData.append('file', file)
+
+                  const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                  })
+
+                  if (res.ok) {
+                    const data = await res.json()
+                    const input = document.querySelector(
+                      'input[name="imagen"]'
+                    ) as HTMLInputElement
+                    input.value = data.url
+                    toast.success('Imagen subida correctamente')
+                  } else {
+                    toast.error('Error al subir imagen')
+                  }
+                }}
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <input
+                type="text"
+                name="imagen"
+                placeholder="URL de la imagen"
+                defaultValue={modoEdicion ? comunicadoEditando?.imagen : ''}
+                readOnly
+                className="w-full border rounded px-3 py-2"
+              />
+
+              <div className="mt-2">
+                {modoEdicion && comunicadoEditando?.imagen && (
+                  <img
+                    src={comunicadoEditando.imagen}
+                    alt="Preview"
+                    className="max-h-48 rounded shadow"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                )}
+              </div>
+            </div>
 
             <input
               name="linkExterno"
@@ -268,7 +314,6 @@ export default function ComunicadosPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal Confirmación Eliminación */}
       <Dialog open={confirmarEliminacion} onOpenChange={setConfirmarEliminacion}>
         <DialogContent>
           <DialogHeader>

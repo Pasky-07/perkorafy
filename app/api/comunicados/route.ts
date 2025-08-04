@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
-    const ahora = new Date()
+    const ahora = new Date(new Date().toISOString()) // fuerza formato ISO compatible con Prisma
 
     const comunicados = await prisma.comunicado.findMany({
       where: {

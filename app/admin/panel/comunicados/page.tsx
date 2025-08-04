@@ -278,7 +278,7 @@ export default function ComunicadosPage() {
                 Visible
               </label>
             </div>
-
+            <label className="block text-sm font-medium mb-1">Fecha caducidad</label>
             <input
               type="date"
               name="fechaCaducidad"
